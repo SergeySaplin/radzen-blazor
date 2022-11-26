@@ -97,7 +97,17 @@
         }
 
         <div class="rz-dropdown-trigger  rz-corner-right">
-            <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
+            @*s.saplin*@
+            @*<span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>*@
+            @if (ButtomsTemplate != null)
+            {
+                @ButtomsTemplate(selectedItem)
+            }
+            else
+            {
+                <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down" @onclick="@(args => OpenPopup("ArrowDown", false, true))"></span>
+            }
+            @*s.saplin*@
         </div>
 
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"

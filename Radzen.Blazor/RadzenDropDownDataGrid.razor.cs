@@ -44,6 +44,13 @@ namespace Radzen.Blazor
         public bool Chips { get; set; }
 
         /// <summary>
+        /// Gets or sets the buttoms template.
+        /// </summary>
+        /// <value>The buttoms template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> ButtomsTemplate { get; set; }
+
+        /// <summary>
         /// Executes CellRender callback.
         /// </summary>
         protected virtual void OnCellRender(DataGridCellRenderEventArgs<object> args)

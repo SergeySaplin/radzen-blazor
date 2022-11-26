@@ -46,6 +46,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ClearSearchAfterSelection { get; set; }
 
+        /// <summary>
+        /// Gets or sets the buttoms template.
+        /// </summary>
+        /// <value>The buttoms template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> ButtomsTemplate { get; set; }
+
         private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
         {
             if (OpenOnFocus)
