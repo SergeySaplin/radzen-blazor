@@ -375,19 +375,28 @@ namespace Radzen
 
             if (_data != null)
             {
+                var query = _data.AsQueryable();
+
+                var type = query.ElementType;
+
+                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                {
+                    type = query.FirstOrDefault().GetType();
+                }
+
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    valuePropertyGetter = PropertyAccess.Getter<object, object>(ValueProperty);
+                    valuePropertyGetter = PropertyAccess.Getter<object, object>(ValueProperty, type);
                 }
 
                 if (!string.IsNullOrEmpty(TextProperty))
                 {
-                    textPropertyGetter = PropertyAccess.Getter<object, object>(TextProperty);
+                    textPropertyGetter = PropertyAccess.Getter<object, object>(TextProperty, type);
                 }
 
                 if (!string.IsNullOrEmpty(DisabledProperty))
                 {
-                    disabledPropertyGetter = PropertyAccess.Getter<object, object>(DisabledProperty);
+                    disabledPropertyGetter = PropertyAccess.Getter<object, object>(DisabledProperty, type);
                 }
             }
         }
@@ -417,6 +426,12 @@ namespace Radzen
                 else if (property == DisabledProperty && disabledPropertyGetter != null)
                 {
                     return disabledPropertyGetter(item);
+                }
+
+                var enumValue = item as Enum;
+                if (enumValue != null)
+                {
+                    return Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
                 }
             }
 
@@ -981,6 +996,11 @@ namespace Radzen
         /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         public async System.Threading.Tasks.Task SelectItem(object item, bool raiseChange = true)
         {
+            if (disabledPropertyGetter != null && disabledPropertyGetter(item) as bool? == true)
+            {
+                return;
+            }
+
             if (!Multiple)
             {
                 if (object.Equals(item, selectedItem))
@@ -989,7 +1009,7 @@ namespace Radzen
                 selectedItem = item;
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    internalValue = GetItemOrValueFromProperty(item, ValueProperty);
+                    internalValue = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
                 }
                 else
                 {

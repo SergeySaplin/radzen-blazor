@@ -10,6 +10,8 @@
 
     protected override void OnInitialized()
     {
+#if !RADZEN
         ThemeService.Initialize(NavigationManager);
+#endif
     }
 }

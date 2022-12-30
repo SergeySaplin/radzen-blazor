@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -80,6 +81,11 @@ namespace Radzen
         /// SecondFilterOperator.
         /// </summary>
         public FilterOperator SecondFilterOperator { get; set; }
+
+        /// <summary>
+        /// LogicalFilterOperator.
+        /// </summary>
+        public LogicalFilterOperator LogicalFilterOperator { get; set; }
     }
 #if NET7_0_OR_GREATER
 #else
@@ -666,6 +672,33 @@ namespace Radzen
         /// The user can select multiple rows.
         /// </summary>
         Multiple
+    }
+
+    /// <summary>
+    /// Specifies the grid lines of <see cref="RadzenDataGrid{TItem}" />.
+    /// </summary>
+    public enum DataGridGridLines
+    {
+        /// <summary>
+        /// Theme default.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Both horizontal and vertical grid lines.
+        /// </summary>
+        Both,
+        /// <summary>
+        /// No grid lines.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Horizontal grid lines.
+        /// </summary>
+        Horizontal,
+        /// <summary>
+        /// Vertical grid lines.
+        /// </summary>
+        Vertical
     }
 
     /// <summary>
@@ -1938,10 +1971,65 @@ namespace Radzen
         /// <typeparam name="TItem">The owner type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <param name="propertyName">Name of the property to return.</param>
+        /// <param name="type">Type of the object.</param>
         /// <returns>A function which return the specified property by its name.</returns>
-        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName)
+        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName, Type type = null)
         {
-            return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
+            if (propertyName.Contains("["))
+            {
+                return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
+            }
+            else
+            {
+                var arg = Expression.Parameter(typeof(TItem));
+
+                Expression body = arg;
+
+                if (type != null)
+                {
+                    body = Expression.Convert(body, type);
+                }
+
+                foreach (var member in propertyName.Split("."))
+                {
+                    if (body.Type.IsInterface)
+                    {
+                        body = Expression.Property(body,
+                            new [] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
+                            member
+                        );
+                    }
+                    else
+                    {
+                        try
+                        {
+                            body = Expression.PropertyOrField(body, member);
+                        }
+                        catch (AmbiguousMatchException)
+                        {
+                            var property = body.Type.GetProperty(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
+                            if (property != null)
+                            {
+                                body = Expression.Property(body, property);
+                            }
+                            else
+                            {
+                                var field = body.Type.GetField(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
+                                if (field != null)
+                                {
+                                    body = Expression.Field(body, field);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                body = Expression.Convert(body, typeof(TValue));
+
+                return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
+            }
         }
 
         /// <summary>

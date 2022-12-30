@@ -9,6 +9,30 @@ namespace Radzen.Blazor.Tests
 {
     public class PropertyAccessTests
     {
+        public partial class TestData
+        {
+            public string PROPERTY { get; set; }
+            public string Property { get; set; }
+        }
+
+        [Fact]
+        public void Getter_With_DifferentTargetType()
+        {
+            var o = new TestData { Property = "test" };
+            var getter = PropertyAccess.Getter<object, object>(nameof(TestData.Property), typeof(TestData));
+            var value = getter(o);
+            Assert.Equal(o.Property, value);
+        }
+
+        [Fact]
+        public void Getter_With_Members_That_Differ_Only_In_Casing()
+        {
+            var o = new TestData { PROPERTY = nameof(TestData.PROPERTY), Property = nameof(TestData.Property) };
+            var getter = PropertyAccess.Getter<TestData, string>(nameof(TestData.PROPERTY));
+            var value = getter(o);
+            Assert.Equal(nameof(TestData.PROPERTY), value);
+        }
+
         [Fact]
         public void Getter_Resolves_Property_On_Simple_Object()
         {
@@ -26,7 +50,7 @@ namespace Radzen.Blazor.Tests
                 new SimpleObject() { Prop1 = "TestString" },
             };
 
-            Func<object, object> getter = PropertyAccess.Getter<object, object>("Prop1");
+            Func<object, object> getter = PropertyAccess.Getter<object, object>("Prop1", typeof(SimpleObject));
 
             var value = getter(_data[0]);
             Assert.Equal("TestString", value);
