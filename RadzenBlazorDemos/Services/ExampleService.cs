@@ -447,6 +447,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "GridLines",
+                    New = true,
+                    Path = "datagrid-grid-lines",
+                    Title = "Blazor DataGrid grid lines",
+                    Icon = "&#xf016",
+                    Tags = new [] { "grid", "lines", "border", "gridlines" }
+                },
+                new Example()
+                {
                     Name = "Cell Context Menu",
                     Path = "datagrid-cell-contextmenu",
                     Title = "Blazor DataGrid cell context menu",
@@ -656,7 +665,8 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Dialog component",
                     Path = "dialog",
                     Icon = "&#xe8a7",
-                    Tags = new [] { "popup", "window" }
+                    Tags = new [] { "popup", "window" },
+                    Updated = true
                 },
                 new Example()
                 {
@@ -963,6 +973,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "SpeechToTextButton",
+                    New = true,
+                    Title = "Blazor speech to text button component",
+                    Path = "speechtotextbutton",
+                    Icon = "&#xe029"
+                },
+                new Example()
+                {
                     Name = "SplitButton",
                     Updated = true,
                     Title = "Blazor split button component",
@@ -1077,6 +1095,14 @@ namespace RadzenBlazorDemos
                     Path = "chart-annotations",
                     Icon = "&#xe06f",
                     Tags = new [] { "chart", "annotation", "label" }
+                },
+                new Example
+                {
+                    Name = "Interpolation",
+                    Path = "chart-interpolation",
+                    Icon = "&#xe922",
+                    New = true,
+                    Tags = new [] { "chart", "interpolation", "spline", "step" }
                 },
                 new Example
                 {
