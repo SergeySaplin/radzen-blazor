@@ -1060,6 +1060,13 @@ namespace Radzen.Blazor
         public bool AllowColumnPicking { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether cell data should be shown as tooltip.
+        /// </summary>
+        /// <value><c>true</c> if cell data is shown as tooltip; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowCellDataAsTooltip { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the column picker columns showing text.
         /// </summary>
         /// <value>The column picker columns showing text.</value>
@@ -1683,10 +1690,29 @@ namespace Radzen.Blazor
             return !collapsedGroupItems.Keys.Contains(item);
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether all groups should be expanded when DataGrid is grouped.
+        /// </summary>
+        /// <value><c>true</c> if groups are expanded; otherwise, <c>false</c>.</value> 
+        [Parameter]
+        public bool? AllGroupsExpanded { get; set; }
+
+        /// <summary>
+        /// Gets or sets the AllGroupsExpanded changed callback.
+        /// </summary>
+        /// <value>The AllGroupsExpanded changed callback.</value>
+        [Parameter]
+        public EventCallback<bool?> AllGroupsExpandedChanged { get; set; }
+
+        internal bool? allGroupsExpanded;
+
         internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
             if (expandedOnLoad == true)
                 return;
+
+            allGroupsExpanded = null;
+            await AllGroupsExpandedChanged.InvokeAsync(allGroupsExpanded);
 
             if (!collapsedGroupItems.Keys.Contains(item))
             {
@@ -1754,6 +1780,13 @@ namespace Radzen.Blazor
 
             bool valueChanged = parameters.DidParameterChange(nameof(Value), Value);
 
+
+            var allGroupsExpandedChanged = parameters.DidParameterChange(nameof(AllGroupsExpanded), AllGroupsExpanded);
+            if (allGroupsExpandedChanged)
+            {
+                allGroupsExpanded = parameters.GetValueOrDefault<bool?>(nameof(AllGroupsExpanded));
+            }
+
             await base.SetParametersAsync(parameters);
 
             if (valueChanged)
@@ -1766,8 +1799,13 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (emptyTextChanged)
+            if (emptyTextChanged || allGroupsExpandedChanged && Groups.Any())
             {
+                if (allGroupsExpandedChanged && Groups.Any() && allGroupsExpanded == true)
+                {
+                    collapsedGroupItems.Clear();
+                }
+
                 await ChangeState();
             }
 
