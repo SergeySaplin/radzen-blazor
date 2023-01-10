@@ -406,7 +406,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
+		internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
         {
             if (selectedColumns == null)
                 return;
@@ -2810,5 +2810,12 @@ namespace Radzen.Blazor
 
             await OnPageChanged(args);
         }
-    }
+
+		//+s.saplin
+		public void UpdatePickableColumns()
+		{
+			allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
+		}
+		//-s.saplin
+	}
 }
