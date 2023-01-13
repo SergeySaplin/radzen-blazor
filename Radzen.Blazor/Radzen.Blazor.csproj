@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <NoWarn>BL9993</NoWarn>
-    <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0</TargetFrameworks>
+    <NoWarn>BL9993;BL0005;BL0007;CS1591;CS4014;CS1574;CS8073;CS0169;CS0472;CS1998;CS1570</NoWarn>
+    <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>7.3</LangVersion>
     <OutputType>Library</OutputType>
@@ -38,7 +38,7 @@
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
     <None Include="icon.png" Pack="true" PackagePath="" />
-	<None Include="README.md" Pack="true" PackagePath="\"/>
+	<None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,14 +58,14 @@
 
  <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net6.0'">
     <PropertyGroup>
-      <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
+      <_SassFileList>@(Sass->'"%(FullPath)"', ' ')</_SassFileList>
       <LibSassBuilderArgs>files $(_SassFileList) --outputstyle $(LibSassOutputStyle) --level $(LibSassOutputLevel)</LibSassBuilderArgs>
     </PropertyGroup>
     <Message Text="$(LibSassBuilderArgs)" Importance="$(LibSassMessageLevel)" />
     <Message Text="Converted SassFile list to argument" Importance="$(LibSassMessageLevel)" />
   </Target>
 
-  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net6.0'" >
+  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net6.0'">
     <ItemGroup>
         <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
