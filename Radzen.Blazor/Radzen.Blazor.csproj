@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <NoWarn>BL9993;BL0005;BL0007;CS1591;CS4014;CS1574;CS8073;CS0169;CS0472;CS1998;CS1570</NoWarn>
+    <NoWarn>BL9993</NoWarn>
     <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>7.3</LangVersion>
