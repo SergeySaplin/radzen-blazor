@@ -1149,7 +1149,7 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnReorder(MouseEventArgs args, int columnIndex)
         {
-            if (indexOfColumnToReoder != null)
+            if (indexOfColumnToReoder != null && AllowColumnReorder)
             {
                 var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
                 var columnToReorder = visibleColumns.ElementAtOrDefault(indexOfColumnToReoder.Value);
@@ -1776,6 +1776,8 @@ namespace Radzen.Blazor
         {
             var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
 
+            var allowColumnPickingChanged = parameters.DidParameterChange(nameof(AllowColumnPicking), AllowColumnPicking);
+
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             bool valueChanged = parameters.DidParameterChange(nameof(Value), Value);
@@ -1799,11 +1801,17 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (emptyTextChanged || allGroupsExpandedChanged && Groups.Any())
+            if (allowColumnPickingChanged || emptyTextChanged || allGroupsExpandedChanged && Groups.Any())
             {
                 if (allGroupsExpandedChanged && Groups.Any() && allGroupsExpanded == true)
                 {
                     collapsedGroupItems.Clear();
+                }
+
+                if (allowColumnPickingChanged)
+                {
+                    selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
+                    allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
                 }
 
                 await ChangeState();
@@ -2789,6 +2797,7 @@ namespace Radzen.Blazor
                         {
                             c.SetVisible(true);
                         });
+                        columns = allColumns.Where(c => c.Parent == null).ToList();
                         InvokeAsync(Reload);
 
                         canSaveSettings = true;
