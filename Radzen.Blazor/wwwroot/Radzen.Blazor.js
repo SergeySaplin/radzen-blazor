@@ -994,6 +994,7 @@ window.Radzen = {
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
+    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
   },
   closePopupOrDialog: function (e) {
       e = e || window.event;
@@ -1228,7 +1229,9 @@ window.Radzen = {
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {
-      ref.innerHTML = value;
+        if (ref != null) {
+            ref.innerHTML = value;
+        }
     } else {
       return ref.innerHTML;
     }

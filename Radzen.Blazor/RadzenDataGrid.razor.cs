@@ -502,15 +502,7 @@ namespace Radzen.Blazor
         {
             if (column != null && !string.IsNullOrEmpty(column.FormatString))
             {
-                var formats = column.FormatString.Split(new char[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-                if (formats.Length > 0)
-                {
-                    var format = formats[0].Trim().Split(':');
-                    if (format.Length > 1)
-                    {
-                        return format[1].Trim();
-                    }
-                }
+                return column.FormatString.Replace("{0:", "").Replace("}", "");
             }
 
             return FilterDateFormat;
@@ -1891,6 +1883,61 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task ExpandRow(TItem item)
         {
             await ExpandItem(item);
+        }
+
+        /// <summary>
+        /// Expands a range of rows.
+        /// </summary>
+        /// <param name="items">The range of rows.</param>
+        public async System.Threading.Tasks.Task ExpandRows(IEnumerable<TItem> items)
+        {
+            // Only allow the functionality when multiple row expand is allowed
+            if (this.ExpandMode != DataGridExpandMode.Multiple) return;
+
+            foreach (TItem item in items)
+            {
+                if (!expandedItems.Keys.Contains(item))
+                {
+                    expandedItems.Add(item, true);
+                    await RowExpand.InvokeAsync(item);
+
+                    var args = new DataGridLoadChildDataEventArgs<TItem>() { Item = item };
+                    await LoadChildData.InvokeAsync(args);
+
+                    if (args.Data != null && !childData.ContainsKey(item))
+                    {
+                        childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data, ParentChildData = childData.Where(c => c.Value.Data.Contains(item)).Select(c => c.Value).FirstOrDefault() });
+                        _view = null;
+                    }
+                }
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Collapse a range of rows.
+        /// </summary>
+        /// <param name="items">The range of rows.</param>
+        public async System.Threading.Tasks.Task CollapseRows(IEnumerable<TItem> items)
+        {
+            // Only allow the functionality when multiple row expand is allowed
+            if (this.ExpandMode != DataGridExpandMode.Multiple) return;
+
+            foreach (TItem item in items)
+            {
+                if (expandedItems.Keys.Contains(item))
+                {
+                    expandedItems.Remove(item);
+                    await RowCollapse.InvokeAsync(item);
+
+                    if (childData.ContainsKey(item))
+                    {
+                        childData.Remove(item);
+                        _view = null;
+                    }
+                }
+            }
+            await InvokeAsync(StateHasChanged);
         }
 
         internal async System.Threading.Tasks.Task ExpandItem(TItem item)
