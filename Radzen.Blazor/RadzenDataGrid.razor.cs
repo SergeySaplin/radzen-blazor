@@ -1307,6 +1307,7 @@ namespace Radzen.Blazor
             get
             {
                 var orderBy = GetOrderBy();
+                Query.OrderBy = orderBy;
 
                 if (LoadData.HasDelegate)
                 {
@@ -2533,7 +2534,7 @@ namespace Radzen.Blazor
                     var descriptor = Groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
                     if (descriptor == null)
                     {
-                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title, SortOrder = column.GetSortOrder() ?? SortOrder.Ascending  };
+                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.GetTitle(), SortOrder = column.GetSortOrder() ?? SortOrder.Ascending  };
                         Groups.Add(descriptor);
                         _groupedPagedView = null;
 
@@ -2706,7 +2707,7 @@ namespace Radzen.Blazor
             {
                 settings = new DataGridSettings()
                 {
-                    Columns = ColumnsCollection.ToList().Select(c => new DataGridColumnSettings()
+                    Columns = ColumnsCollection.ToList().Where(c => !string.IsNullOrEmpty(c.Property)).Select(c => new DataGridColumnSettings()
                     {
                         Property = c.Property,
                         Width = c.GetWidth(),
