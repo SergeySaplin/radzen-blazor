@@ -1894,7 +1894,12 @@ namespace Radzen.Blazor
             {
                 if (settings != null)
                 {
-                    await LoadSettings(settings);
+                    //s.saplin
+                    try
+                    {
+                        await LoadSettings(settings);
+                    }
+                    catch { }
                 }
 
                 var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
