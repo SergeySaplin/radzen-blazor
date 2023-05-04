@@ -49,6 +49,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the child columns.
+        /// </summary>
+        /// <value>The child columns.</value>
+        public IList<RadzenDataGridColumn<TItem>> ColumnsCollection
+        {
+            get
+            {
+                return Grid.childColumns.Where(c => c.Parent == this).ToList();
+            }
+        }
+
         internal int GetLevel()
         {
             int i = 0;
@@ -135,7 +147,7 @@ namespace Radzen.Blazor
         [Parameter]
         public int? OrderIndex { get; set; }
 
-        internal int? GetOrderIndex()
+        public int? GetOrderIndex()
         {
             return orderIndex ?? OrderIndex;
         }
@@ -560,17 +572,12 @@ namespace Radzen.Blazor
                 descriptor = new SortDescriptor() { Property = GetSortProperty() };
             }
 
-            if (GetSortOrder() == null)
+            if (order.HasValue)
             {
-                SetSortOrderInternal(Radzen.SortOrder.Ascending);
-                descriptor.SortOrder = Radzen.SortOrder.Ascending;
+                SetSortOrderInternal(order.Value);
+                descriptor.SortOrder = order.Value;
             }
-            else if (GetSortOrder() == Radzen.SortOrder.Ascending)
-            {
-                SetSortOrderInternal(Radzen.SortOrder.Descending);
-                descriptor.SortOrder = Radzen.SortOrder.Descending;
-            }
-            else if (GetSortOrder() == Radzen.SortOrder.Descending)
+            else
             {
                 SetSortOrderInternal(null);
                 if (Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
