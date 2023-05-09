@@ -2994,10 +2994,10 @@ namespace Radzen.Blazor
         }
 
 		//+s.saplin
-		public void UpdatePickableColumns()
-		{
-			allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
-		}
+		//public void UpdatePickableColumns()
+		//{
+		//	allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
+		//}
 		//-s.saplin
 	}
 }
